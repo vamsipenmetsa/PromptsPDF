@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import jsPDF from 'jspdf';
@@ -21,14 +20,14 @@ const generatePDF = () => {
   doc.rect(0, 0, 297, 210, 'F'); // Full dark background
   doc.setTextColor(highlightColor);
   doc.setFont('Courier', 'bold');
-  doc.setFontSize(36); // Adjusted font size for the title
+  doc.setFontSize(41); // Adjusted font size for the title
   const wrappedTitle = doc.splitTextToSize(firstSentence, 260); // Wrap title text to fit within slide margins
   let y = 80; // Reset y for title slide
   wrappedTitle.forEach((line) => {
     doc.text(line, 20, y, { align: 'left' }); // Left-aligned title
     y += 12;
   });
-  doc.setFontSize(20);
+  doc.setFontSize(25); // Adjusted font size for the subtitle
   doc.setTextColor(textColor);
   doc.text('Learn How to Prompt with Vamsi Penmetsa', 20, y + 20, { align: 'left' }); // Left-aligned subtitle
 
@@ -46,7 +45,7 @@ const generatePDF = () => {
     doc.rect(0, 0, 297, 210, 'F');
     doc.setTextColor(highlightColor);
     doc.setFont('Courier', 'bold');
-    doc.setFontSize(20);
+    doc.setFontSize(25); // Adjusted font size for headers
 
     // Extract header and content
     const [header, ...contentLines] = section.split('\n');
@@ -59,7 +58,7 @@ const generatePDF = () => {
     // Add content with bullet points
     doc.setTextColor(textColor);
     doc.setFont('Courier', 'normal');
-    doc.setFontSize(14);
+    doc.setFontSize(14); // Adjusted font size for content
     const wrappedContent = content.split('\n').flatMap((line) => {
       if (line.startsWith('-')) {
         return doc.splitTextToSize(`• ${line.slice(1).trim()}`, 260); // Add bullet point symbol
@@ -89,10 +88,10 @@ const generatePDF = () => {
   doc.setFont('Courier', 'bold'); // Coding-style font
   doc.setFontSize(24);
   y = 50; // Reset y for final slide
-  doc.text('Your Prompt:', 20, y, { align: 'left' });
+  doc.text('Your Prompt:', 16, y, { align: 'left' });
 
   doc.setTextColor('#98c379'); // Unique green color for the prompt content
-  doc.setFontSize(16);
+  doc.setFontSize(14);
   // Extract the "Detailed Prompt Template" section from the input text
   const detailedPromptSection = sections.find((section) =>
     section.startsWith('Detailed Prompt Template')
