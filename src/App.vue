@@ -92,32 +92,30 @@ const generatePDF = () => {
 
   doc.setTextColor('#944454');
   doc.setFontSize(16);
-  const promptContent = [
-    'Summarize the following technical document titled "{Document_Title}" which covers {Document_Topic}.',
-    'Please provide a concise summary in under {Word_Limit} words, focusing on the key points such as {Key_Aspects}.',
-    'Format the summary as bullet points for easy reading.',
-    'Here is the document content:',
-    '"""',
-    '{Insert_Document_Text}',
-    '"""'
-  ];
+  // Extract the "Detailed Prompt Template" section from the input text
+  const detailedPromptSection = sections.find((section) =>
+    section.startsWith('Detailed Prompt Template')
+  );
 
-  y += 30;
-  promptContent.forEach((line) => {
-    const wrappedLine = doc.splitTextToSize(line, 180);
-    wrappedLine.forEach((wrapped) => {
+  if (detailedPromptSection) {
+    const [, ...promptContentLines] = detailedPromptSection.split('\n');
+    const promptContent = promptContentLines.join('\n'); // Preserve newlines for proper formatting
+
+    const wrappedPrompt = doc.splitTextToSize(promptContent, 180); // Wrap text to fit within slide margins
+    y += 30; // Add spacing after header
+    wrappedPrompt.forEach((line) => {
       if (y + 10 > 190) {
         doc.addPage();
         doc.setFillColor(backgroundColor);
         doc.rect(0, 0, 210, 210, 'F');
-        doc.setTextColor('#98c379');
+        doc.setTextColor('#944454');
         doc.setFont('Courier', 'normal');
         y = 30;
       }
-      doc.text(wrapped, 15, y, { align: 'left', maxWidth: 180 });
+      doc.text(line, 15, y, { align: 'left', maxWidth: 180 });
       y += 10;
     });
-  });
+  }
 
   doc.setFontSize(10);
   doc.setTextColor(watermarkColor);
