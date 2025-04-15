@@ -117,7 +117,7 @@ const generatePDF = () => {
     });
   }
 
-  doc.setFontSize(10);
+  doc.setFontSize(15);
   doc.setTextColor(watermarkColor);
   doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
 
