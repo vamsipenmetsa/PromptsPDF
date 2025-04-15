@@ -5,120 +5,125 @@ import jsPDF from 'jspdf';
 const inputText = ref('');
 
 const generatePDF = () => {
-  const doc = new jsPDF({ orientation: 'landscape' });
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, 210] }); // 1:1 square slides
 
-  // Atom One Dark theme colors
-  const backgroundColor = '#1e1e2f';
-  const textColor = '#dcdcdc';
-  const highlightColor = '#c678dd';
+  const backgroundColor = '#FBFAF4'; // Updated background color
+  const textColor = '#2E5E5A'; // Updated text color
+  const highlightColor = '#091717'; // Keeping highlight color as is
+  const watermarkColor = '#20808D'; // Keeping watermark color as is
 
-  // Extract the first sentence as the title (remove special characters)
   const firstSentence = inputText.value.split(/\.|\n/)[0].replace(/[^a-zA-Z0-9 ]/g, '').trim();
 
   // Title slide
   doc.setFillColor(backgroundColor);
-  doc.rect(0, 0, 297, 210, 'F'); // Full dark background
+  doc.rect(0, 0, 210, 210, 'F'); // Full square background
   doc.setTextColor(highlightColor);
   doc.setFont('Courier', 'bold');
-  doc.setFontSize(41); // Adjusted font size for the title
-  const wrappedTitle = doc.splitTextToSize(firstSentence, 260); // Wrap title text to fit within slide margins
-  let y = 80; // Reset y for title slide
+  doc.setFontSize(41);
+  const wrappedTitle = doc.splitTextToSize(firstSentence, 180); // Wrap title text to fit within slide margins
+  let y = 50;
   wrappedTitle.forEach((line) => {
-    doc.text(line, 20, y, { align: 'left' }); // Left-aligned title
+    doc.text(line, 15, y, { align: 'left', maxWidth: 180 }); // Ensure text stays within slide margins
     y += 12;
   });
-  doc.setFontSize(25); // Adjusted font size for the subtitle
+  doc.setFontSize(25);
   doc.setTextColor(textColor);
-  doc.text('Learn How to Prompt with Vamsi Penmetsa', 20, y + 20, { align: 'left' }); // Left-aligned subtitle
+  doc.text('Learn How to Prompt with Vamsi Penmetsa', 15, y + 20, { align: 'left', maxWidth: 180 });
 
-  // Split input into sections by '---' divider
+  doc.setFontSize(15);
+  doc.setTextColor(watermarkColor);
+  doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
+
   const sections = inputText.value.split(/---/).map((section) => section.trim()).filter(Boolean);
 
   sections.forEach((section, index) => {
-    // Add a new page for each section, skipping the first slide
     if (index === 0) return;
 
     doc.addPage();
 
-    // Set background and text styles
     doc.setFillColor(backgroundColor);
-    doc.rect(0, 0, 297, 210, 'F');
+    doc.rect(0, 0, 210, 210, 'F');
     doc.setTextColor(highlightColor);
     doc.setFont('Courier', 'bold');
-    doc.setFontSize(25); // Adjusted font size for headers
+    doc.setFontSize(25);
 
-    // Extract header and content
     const [header, ...contentLines] = section.split('\n');
-    const content = contentLines.join('\n'); // Preserve newlines for proper formatting
+    const content = contentLines.join('\n');
 
-    // Add header
-    y = 50; // Reset y for each new section
-    doc.text(header.replace(/[^a-zA-Z0-9 ]/g, '').trim(), 20, y, { align: 'left' }); // Left-aligned header
+    y = 30;
+    doc.text(header.replace(/[^a-zA-Z0-9 ]/g, '').trim(), 15, y, { align: 'left', maxWidth: 180 });
 
-    // Add content with bullet points
     doc.setTextColor(textColor);
-    doc.setFont('Courier', 'normal');
-    doc.setFontSize(14); // Adjusted font size for content
+    doc.setFont('Courier', 'bold');
+    doc.setFontSize(16);
     const wrappedContent = content.split('\n').flatMap((line) => {
       if (line.startsWith('-')) {
-        return doc.splitTextToSize(`• ${line.slice(1).trim()}`, 260); // Add bullet point symbol
+        return doc.splitTextToSize(`• ${line.slice(1).trim()}`, 180);
       }
-      return doc.splitTextToSize(line.trim(), 260);
+      return doc.splitTextToSize(line.trim(), 180);
     });
 
-    y += 20; // Add spacing after header
+    y += 20;
     wrappedContent.forEach((line) => {
       if (y + 10 > 190) {
         doc.addPage();
         doc.setFillColor(backgroundColor);
-        doc.rect(0, 0, 297, 210, 'F');
+        doc.rect(0, 0, 210, 210, 'F');
         doc.setTextColor(textColor);
-        y = 20; // Reset y for new page
+        y = 30;
       }
-      doc.text(line, 20, y, { align: 'left' }); // Left-aligned content
+      doc.text(line, 15, y, { align: 'left', maxWidth: 180 });
+      y += 10;
+    });
+
+    doc.setFontSize(15);
+    doc.setTextColor(watermarkColor);
+    doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
+  });
+
+  doc.addPage();
+  doc.setFillColor(backgroundColor);
+  doc.rect(0, 0, 210, 210, 'F');
+  doc.setTextColor('#133B39');
+  doc.setFont('Courier', 'bold');
+  doc.setFontSize(24);
+  y = 30;
+  doc.text('Your Prompt:', 15, y, { align: 'left', maxWidth: 180 });
+
+  doc.setTextColor('#944454');
+  doc.setFontSize(16);
+  const promptContent = [
+    'Summarize the following technical document titled "{Document_Title}" which covers {Document_Topic}.',
+    'Please provide a concise summary in under {Word_Limit} words, focusing on the key points such as {Key_Aspects}.',
+    'Format the summary as bullet points for easy reading.',
+    'Here is the document content:',
+    '"""',
+    '{Insert_Document_Text}',
+    '"""'
+  ];
+
+  y += 30;
+  promptContent.forEach((line) => {
+    const wrappedLine = doc.splitTextToSize(line, 180);
+    wrappedLine.forEach((wrapped) => {
+      if (y + 10 > 190) {
+        doc.addPage();
+        doc.setFillColor(backgroundColor);
+        doc.rect(0, 0, 210, 210, 'F');
+        doc.setTextColor('#98c379');
+        doc.setFont('Courier', 'normal');
+        y = 30;
+      }
+      doc.text(wrapped, 15, y, { align: 'left', maxWidth: 180 });
       y += 10;
     });
   });
 
-  // Final slide with dynamic prompt style
-  doc.addPage();
-  doc.setFillColor(backgroundColor);
-  doc.rect(0, 0, 297, 210, 'F');
-  doc.setTextColor('#e06c75'); // Unique red color for the prompt header
-  doc.setFont('Courier', 'bold'); // Coding-style font
-  doc.setFontSize(24);
-  y = 50; // Reset y for final slide
-  doc.text('Your Prompt:', 16, y, { align: 'left' });
+  doc.setFontSize(10);
+  doc.setTextColor(watermarkColor);
+  doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
 
-  doc.setTextColor('#98c379'); // Unique green color for the prompt content
-  doc.setFontSize(14);
-  // Extract the "Detailed Prompt Template" section from the input text
-  const detailedPromptSection = sections.find((section) =>
-    section.startsWith('Detailed Prompt Template')
-  );
-
-  if (detailedPromptSection) {
-    const [, ...promptContentLines] = detailedPromptSection.split('\n');
-    const promptContent = promptContentLines.join('\n'); // Preserve newlines for proper formatting
-
-    const wrappedPrompt = doc.splitTextToSize(promptContent, 260); // Wrap text to fit within slide margins
-    y += 30; // Add spacing after header
-    wrappedPrompt.forEach((line) => {
-      if (y + 10 > 190) {
-        doc.addPage();
-        doc.setFillColor(backgroundColor);
-        doc.rect(0, 0, 297, 210, 'F');
-        doc.setTextColor('#98c379');
-        doc.setFont('Courier', 'normal');
-        y = 20; // Reset y for new page
-      }
-      doc.text(line, 20, y, { align: 'left' });
-      y += 10;
-    });
-  }
-
-  // Save the PDF with the title as the filename
-  const sanitizedTitle = firstSentence.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_'); // Sanitize and format the title
+  const sanitizedTitle = firstSentence.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_');
   doc.save(`${sanitizedTitle}.pdf`);
 };
 </script>
