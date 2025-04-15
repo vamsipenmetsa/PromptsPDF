@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import jsPDF from 'jspdf';
@@ -80,7 +81,7 @@ const generatePDF = () => {
     });
   });
 
-  // Final slide with unique prompt style
+  // Final slide with dynamic prompt style
   doc.addPage();
   doc.setFillColor(backgroundColor);
   doc.rect(0, 0, 297, 210, 'F');
@@ -92,20 +93,18 @@ const generatePDF = () => {
 
   doc.setTextColor('#98c379'); // Unique green color for the prompt content
   doc.setFontSize(16);
-  const promptContent = [
-    'Summarize the following technical document titled "{Document_Title}" which covers {Document_Topic}.',
-    'Please provide a concise summary in under {Word_Limit} words, focusing on the key points such as {Key_Aspects}.',
-    'Format the summary as bullet points for easy reading.',
-    'Here is the document content:',
-    '"""',
-    '{Insert_Document_Text}',
-    '"""'
-  ];
+  // Extract the "Detailed Prompt Template" section from the input text
+  const detailedPromptSection = sections.find((section) =>
+    section.startsWith('Detailed Prompt Template')
+  );
 
-  y += 30; // Add spacing after header
-  promptContent.forEach((line) => {
-    const wrappedLine = doc.splitTextToSize(line, 260); // Wrap text to fit within slide margins
-    wrappedLine.forEach((wrapped) => {
+  if (detailedPromptSection) {
+    const [, ...promptContentLines] = detailedPromptSection.split('\n');
+    const promptContent = promptContentLines.join('\n'); // Preserve newlines for proper formatting
+
+    const wrappedPrompt = doc.splitTextToSize(promptContent, 260); // Wrap text to fit within slide margins
+    y += 30; // Add spacing after header
+    wrappedPrompt.forEach((line) => {
       if (y + 10 > 190) {
         doc.addPage();
         doc.setFillColor(backgroundColor);
@@ -114,10 +113,10 @@ const generatePDF = () => {
         doc.setFont('Courier', 'normal');
         y = 20; // Reset y for new page
       }
-      doc.text(wrapped, 20, y, { align: 'left' });
+      doc.text(line, 20, y, { align: 'left' });
       y += 10;
     });
-  });
+  }
 
   // Save the PDF with the title as the filename
   const sanitizedTitle = firstSentence.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_'); // Sanitize and format the title
