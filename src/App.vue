@@ -27,7 +27,7 @@ const generatePDF = () => {
     y += 12;
   });
   doc.setFontSize(25);
-  doc.setTextColor(textColor);
+  doc.setTextColor('#944454');
   doc.text('Creative PROMPTS by Vamsi Penmetsa', 15, y + 20, { align: 'left', maxWidth: 180 });
 
   doc.setFontSize(15);
