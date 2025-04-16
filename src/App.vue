@@ -15,7 +15,7 @@ const generatePDF = () => {
   const firstSentence = inputText.value.split(/\.|\n/)[0].replace(/[^a-zA-Z0-9 ]/g, '').trim();
 
   // Title slide
-  doc.setFillColor(backgroundColor);
+  doc.setFillColor('#FCE5DE'); // Updated background color to #FCE5DE
   doc.rect(0, 0, 210, 210, 'F'); // Full square background
   doc.setTextColor(highlightColor);
   doc.setFont('Courier', 'bold');
@@ -30,9 +30,6 @@ const generatePDF = () => {
   doc.setTextColor('#944454');
   doc.text('Creative PROMPTS by Vamsi Penmetsa', 15, y + 20, { align: 'left', maxWidth: 180 });
 
-  doc.setFontSize(15);
-  doc.setTextColor(watermarkColor);
-  doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
 
   const sections = inputText.value.split(/---/).map((section) => section.trim()).filter(Boolean);
 
@@ -76,50 +73,19 @@ const generatePDF = () => {
       y += 10;
     });
 
-    doc.setFontSize(15);
+    doc.setFontSize(18);
     doc.setTextColor(watermarkColor);
-    doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
+    doc.text('@VamsiPenmetsa', 105, 200, { align: 'center' });
   });
 
+  // Add a final page with a call to action
   doc.addPage();
-  doc.setFillColor(backgroundColor);
-  doc.rect(0, 0, 210, 210, 'F');
-  doc.setTextColor('#133B39');
+  doc.setFillColor('#FCE5DE'); // Set background color to #FCE5DE
+  doc.rect(0, 0, 210, 210, 'F'); // Full square background
+  doc.setTextColor('#944454'); // Set text color to #944454
   doc.setFont('Courier', 'bold');
-  doc.setFontSize(24);
-  y = 30;
-  doc.text('Your Prompt:', 15, y, { align: 'left', maxWidth: 180 });
-
-  doc.setTextColor('#944454');
-  doc.setFontSize(16);
-  // Extract the "Detailed Prompt Template" section from the input text
-  const detailedPromptSection = sections.find((section) =>
-    section.startsWith('Detailed Prompt Template')
-  );
-
-  if (detailedPromptSection) {
-    const [, ...promptContentLines] = detailedPromptSection.split('\n');
-    const promptContent = promptContentLines.join('\n'); // Preserve newlines for proper formatting
-
-    const wrappedPrompt = doc.splitTextToSize(promptContent, 180); // Wrap text to fit within slide margins
-    y += 30; // Add spacing after header
-    wrappedPrompt.forEach((line) => {
-      if (y + 10 > 190) {
-        doc.addPage();
-        doc.setFillColor(backgroundColor);
-        doc.rect(0, 0, 210, 210, 'F');
-        doc.setTextColor('#944454');
-        doc.setFont('Courier', 'normal');
-        y = 30;
-      }
-      doc.text(line, 15, y, { align: 'left', maxWidth: 180 });
-      y += 10;
-    });
-  }
-
-  doc.setFontSize(15);
-  doc.setTextColor(watermarkColor);
-  doc.text('FOLLOW @VamsiPenmetsa', 105, 200, { align: 'center' });
+  doc.setFontSize(30); // Big bold text
+  doc.text('FOLLOW Vamsi Penmetsa ;)', 105, 105, { align: 'center' }); // Centered text
 
   const sanitizedTitle = firstSentence.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_');
   doc.save(`${sanitizedTitle}.pdf`);
