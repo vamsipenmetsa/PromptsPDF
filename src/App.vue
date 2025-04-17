@@ -191,16 +191,33 @@ const generatePDF = async () => {
 </script>
 
 <template>
-  <div id="app">
-    <header>
-      <h1>Carousel Post Generator</h1>
-      <p>Create beautiful PDF slides for LinkedIn posts</p>
-    </header>
+  <div id="app" class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-pink-50 font-sans">
+    <div class="container mx-auto px-4 py-12">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">Carousel Post Generator</h1>
+        <p class="text-lg md:text-xl text-gray-600">Create beautiful PDF slides for LinkedIn posts</p>
+      </header>
 
-    <main>
-      <textarea v-model="inputText" placeholder="Enter your text here... Use '---' to separate sections." rows="10"></textarea>
-      <button @click="generatePDF">Generate PDF</button>
-    </main>
+      <main class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <textarea
+          v-model="inputText"
+          placeholder="Enter your text here... Use '---' on a new line to separate sections."
+          rows="15"
+          class="w-full p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none mb-6 text-gray-700 leading-relaxed"
+        ></textarea>
+        <button
+          @click="generatePDF"
+          class="w-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end text-white font-bold py-3 px-6 rounded-md hover:opacity-90 transition duration-300 text-lg shadow-md"
+        >
+          Generate PDF
+        </button>
+      </main>
+
+      <footer class="relative text-center mt-12 text-gray-400 text-sm z-10">
+        <p>Made with ❤️ by Vamsi Penmetsa.</p>
+        <p>&copy; 2025 Vamsi Penmetsa. All rights reserved.</p>
+      </footer>
+    </div>
   </div>
 </template>
 
@@ -221,13 +238,13 @@ header {
 
 header h1 {
   font-size: 2rem;
-  color: #333;
+  /* color: #333; */ /* Removed to allow Tailwind class to apply */
   font-family: 'Montserrat', sans-serif;
 }
 
 header p {
   font-size: 1.2rem;
-  color: #666;
+  /* color: #666; */ /* Removed to allow Tailwind class to apply */
   font-family: 'Montserrat', sans-serif;
 }
 
