@@ -13,7 +13,7 @@ This project is a simple web application built with Vue.js and Vite that allows 
 
 ## Demo
 
-You can access the live application here: [https://vamsipenmetsa7.github.io/PromptsPDF/](https://vamsipenmetsa7.github.io/PromptsPDF/) or [https://vamsipenmetsa.com](https://vamsipenmetsa.com) (if custom domain is configured).
+You can access the live application here: [https://vamsipenmetsa7.github.io/PromptsPDF/](https://vamsipenmetsa7.github.io/PromptsPDF/).
 
 *(Note: Ensure the GitHub Pages deployment is successful and DNS is configured for these links to work)*
 
