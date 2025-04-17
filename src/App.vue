@@ -1,91 +1,189 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const inputText = ref('');
 
-const generatePDF = () => {
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, 210] }); // 1:1 square slides
+const generatePDF = async () => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, 210] });
 
-  const backgroundColor = '#FBFAF4'; // Updated background color
-  const textColor = '#2E5E5A'; // Updated text color
-  const highlightColor = '#091717'; // Keeping highlight color as is
-  const watermarkColor = '#20808D'; // Keeping watermark color as is
+  // Create a temporary div for rendering the slide
+  const tempDiv = document.createElement('div');
+  tempDiv.style.position = 'absolute';
+  tempDiv.style.left = '-9999px';
+  tempDiv.style.width = '210mm';
+  tempDiv.style.height = '210mm';
+  tempDiv.style.margin = '0';
+  tempDiv.style.padding = '0';
+  document.body.appendChild(tempDiv);
 
   const firstSentence = inputText.value.split(/\.|\n/)[0].replace(/[^a-zA-Z0-9 ]/g, '').trim();
 
   // Title slide
-  doc.setFillColor('#FCE5DE'); // Updated background color to #FCE5DE
-  doc.rect(0, 0, 210, 210, 'F'); // Full square background
-  doc.setTextColor(highlightColor);
-  doc.setFont('Courier', 'bold');
-  doc.setFontSize(41);
-  const wrappedTitle = doc.splitTextToSize(firstSentence, 180); // Wrap title text to fit within slide margins
-  let y = 50;
-  wrappedTitle.forEach((line) => {
-    doc.text(line, 15, y, { align: 'left', maxWidth: 180 }); // Ensure text stays within slide margins
-    y += 12;
-  });
-  doc.setFontSize(25);
-  doc.setTextColor('#944454');
-  doc.text('Creative PROMPTS by Vamsi Penmetsa', 15, y + 20, { align: 'left', maxWidth: 180 });
+  tempDiv.innerHTML = `
+    <div style="
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+    ">
+      <div style="
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 15px;
+        padding: 30px;
+        width: 90%;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      ">
+        <h1 style="
+          color: white;
+          font-size: 40px;
+          margin: 0 0 25px 0;
+          text-align: center;
+          font-family: 'Montserrat', sans-serif;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        ">${firstSentence}</h1>
+        <p style="
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 24px;
+          margin: 0;
+          text-align: center;
+          font-family: 'Montserrat', sans-serif;
+        ">Creative PROMPTS by Vamsi Penmetsa</p>
+      </div>
+    </div>
+  `;
 
+  const titleCanvas = await html2canvas(tempDiv, {
+    width: tempDiv.offsetWidth,
+    height: tempDiv.offsetHeight,
+    scale: 2
+  });
+  const titleImgData = titleCanvas.toDataURL('image/png');
+  doc.addImage(titleImgData, 'PNG', 0, 0, 210, 210);
 
   const sections = inputText.value.split(/---/).map((section) => section.trim()).filter(Boolean);
 
-  sections.forEach((section, index) => {
-    if (index === 0) return;
-
+  for (const section of sections.slice(1)) {
     doc.addPage();
-
-    doc.setFillColor(backgroundColor);
-    doc.rect(0, 0, 210, 210, 'F');
-    doc.setTextColor(highlightColor);
-    doc.setFont('Courier', 'bold');
-    doc.setFontSize(25);
-
+    
     const [header, ...contentLines] = section.split('\n');
     const content = contentLines.join('\n');
 
-    y = 30;
-    doc.text(header.replace(/[^a-zA-Z0-9 ]/g, '').trim(), 15, y, { align: 'left', maxWidth: 180 });
+    tempDiv.innerHTML = `
+      <div style="
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+      ">
+        <div style="
+          background: rgba(255, 255, 255, 0.15);
+          border-radius: 15px;
+          padding: 35px;
+          width: 90%;
+          margin: 0 auto;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        ">
+          <h2 style="
+            color: white;
+            font-size: 34px;
+            margin: 0 0 25px 0;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+          ">${header.replace(/[^a-zA-Z0-9 ]/g, '').trim()}</h2>
+          <div style="
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 20px;
+            line-height: 1.6;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+          ">
+            ${content.split('\n').map(line => 
+              line.startsWith('-') 
+                ? `<p style="margin: 12px 0; text-align: left;">• ${line.slice(1).trim()}</p>`
+                : `<p style="margin: 12px 0; text-align: left;">${line.trim()}</p>`
+            ).join('')}
+          </div>
+          <p style="
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 18px;
+            text-align: right;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+          ">@VamsiPenmetsa</p>
+        </div>
+      </div>
+    `;
 
-    doc.setTextColor(textColor);
-    doc.setFont('Courier', 'bold');
-    doc.setFontSize(16);
-    const wrappedContent = content.split('\n').flatMap((line) => {
-      if (line.startsWith('-')) {
-        return doc.splitTextToSize(`• ${line.slice(1).trim()}`, 180);
-      }
-      return doc.splitTextToSize(line.trim(), 180);
+    const contentCanvas = await html2canvas(tempDiv, {
+      width: tempDiv.offsetWidth,
+      height: tempDiv.offsetHeight,
+      scale: 2
     });
+    const contentImgData = contentCanvas.toDataURL('image/png');
+    doc.addImage(contentImgData, 'PNG', 0, 0, 210, 210);
+  }
 
-    y += 20;
-    wrappedContent.forEach((line) => {
-      if (y + 10 > 190) {
-        doc.addPage();
-        doc.setFillColor(backgroundColor);
-        doc.rect(0, 0, 210, 210, 'F');
-        doc.setTextColor(textColor);
-        y = 30;
-      }
-      doc.text(line, 15, y, { align: 'left', maxWidth: 180 });
-      y += 10;
-    });
-
-    doc.setFontSize(18);
-    doc.setTextColor(watermarkColor);
-    doc.text('@VamsiPenmetsa', 105, 200, { align: 'center' });
-  });
-
-  // Add a final page with a call to action
+  // Final page
   doc.addPage();
-  doc.setFillColor('#FCE5DE'); // Set background color to #FCE5DE
-  doc.rect(0, 0, 210, 210, 'F'); // Full square background
-  doc.setTextColor('#944454'); // Set text color to #944454
-  doc.setFont('Courier', 'bold');
-  doc.setFontSize(30); // Big bold text
-  doc.text('FOLLOW Vamsi Penmetsa ;)', 105, 105, { align: 'center' }); // Centered text
+  tempDiv.innerHTML = `
+    <div style="
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+    ">
+      <div style="
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        width: 80%;
+      ">
+        <h2 style="
+          color: white;
+          font-size: 38px;
+          margin: 0;
+          font-family: 'Montserrat', sans-serif;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        ">FOLLOW Vamsi Penmetsa ;)</h2>
+      </div>
+    </div>
+  `;
+
+  const finalCanvas = await html2canvas(tempDiv, {
+    width: tempDiv.offsetWidth,
+    height: tempDiv.offsetHeight,
+    scale: 2
+  });
+  const finalImgData = finalCanvas.toDataURL('image/png');
+  doc.addImage(finalImgData, 'PNG', 0, 0, 210, 210);
+
+  document.body.removeChild(tempDiv);
 
   const sanitizedTitle = firstSentence.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_');
   doc.save(`${sanitizedTitle}.pdf`);
@@ -107,8 +205,10 @@ const generatePDF = () => {
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
 #app {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Montserrat', sans-serif;
   text-align: center;
   margin: 0 auto;
   max-width: 600px;
@@ -122,17 +222,19 @@ header {
 header h1 {
   font-size: 2rem;
   color: #333;
+  font-family: 'Montserrat', sans-serif;
 }
 
 header p {
   font-size: 1.2rem;
   color: #666;
+  font-family: 'Montserrat', sans-serif;
 }
 
 textarea {
   width: 100%;
   padding: 10px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -143,13 +245,15 @@ button {
   padding: 10px 20px;
   font-size: 1rem;
   color: #fff;
-  background-color: #007BFF;
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: transform 0.2s;
 }
 
 button:hover {
-  background-color: #0056b3;
+  transform: scale(1.05);
 }
 </style>

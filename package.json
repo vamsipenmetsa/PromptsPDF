@@ -9,16 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "jspdf": "^3.0.1",
-    "jspdf-autotable": "^5.0.2",
-    "pptxgenjs": "^3.12.0",
-    "vue": "^3.5.13"
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "vue": "^3.4.15"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/tsconfig": "^0.7.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0",
-    "vue-tsc": "^2.2.4"
+    "@vitejs/plugin-vue": "^5.0.3",
+    "@vue/tsconfig": "^0.5.1",
+    "typescript": "~5.3.3",
+    "vite": "^5.0.12",
+    "vue-tsc": "^1.8.27"
   }
 }
