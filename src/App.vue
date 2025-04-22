@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 const inputText = ref('');
 
 const generatePDF = async () => {
+  // Square PDF format with 210x210mm dimensions
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, 210] });
 
   // Create a temporary div for rendering the slide
@@ -20,7 +21,7 @@ const generatePDF = async () => {
 
   const firstSentence = inputText.value.split(/\.|\n/)[0].replace(/[^a-zA-Z0-9 ]/g, '').trim();
 
-  // Title slide
+  // Title slide with improved side padding to avoid LinkedIn navigation arrows
   tempDiv.innerHTML = `
     <div style="
       width: 100%;
@@ -35,12 +36,14 @@ const generatePDF = async () => {
       box-sizing: border-box;
       font-family: 'Montserrat', sans-serif;
       overflow: hidden;
+      padding-left: 35px;
+      padding-right: 35px;
     ">
       <div style="
         background: rgba(255, 255, 255, 0.15);
         border-radius: 15px;
         padding: 30px;
-        width: 90%;
+        width: 80%;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
       ">
         <h1 style="
@@ -92,18 +95,20 @@ const generatePDF = async () => {
         box-sizing: border-box;
         font-family: 'Montserrat', sans-serif;
         overflow: hidden;
+        padding-left: 35px;
+        padding-right: 35px;
       ">
         <div style="
           background: rgba(255, 255, 255, 0.15);
           border-radius: 15px;
           padding: 35px;
-          width: 90%;
+          width: 80%;
           margin: 0 auto;
           box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         ">
           <h2 style="
             color: white;
-            font-size: 34px;
+            font-size: 32px;
             margin: 0 0 25px 0;
             font-family: 'Montserrat', sans-serif;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -141,7 +146,7 @@ const generatePDF = async () => {
     doc.addImage(contentImgData, 'PNG', 0, 0, 210, 210);
   }
 
-  // Final page
+  // Final page with improved padding for LinkedIn navigation arrows
   doc.addPage();
   tempDiv.innerHTML = `
     <div style="
@@ -159,18 +164,20 @@ const generatePDF = async () => {
       <div style="
         background: rgba(255, 255, 255, 0.15);
         border-radius: 15px;
-        padding: 40px;
-        text-align: center;
+        padding: 40px 20px;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        width: 80%;
+        width: 90%;
+        max-width: 500px;
       ">
         <h2 style="
           color: white;
-          font-size: 38px;
+          font-size: 34px;
           margin: 0;
           font-family: 'Montserrat', sans-serif;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        ">FOLLOW Vamsi Penmetsa ;)</h2>
+          text-align: center;
+          white-space: nowrap;
+        ">FOLLOW Vamsi Penmetsa</h2>
       </div>
     </div>
   `;
