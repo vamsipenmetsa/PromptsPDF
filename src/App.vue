@@ -110,7 +110,6 @@ const generatePDF = async () => {
   const firstSection = sections[0] || "";
   const firstSectionLines = firstSection.split('\n').filter(Boolean);
   const firstTitle = firstSectionLines[0] || "";
-  // Always show this subtitle below the title
   const glassSubtitle = "Creative Prompt Ideas by Vamsi Penmetsa💡";
   const firstSubtitles = firstSectionLines.slice(1).join('<br>');
   tempDiv.innerHTML = `
@@ -131,6 +130,7 @@ const generatePDF = async () => {
       text-align: center;
     ">
       ${createSlideNumberHTML(slideNumber, totalSlides)}
+      <img src="./vamsipenmetsa.png" style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 32px auto; background-color: rgba(255,255,255,0.18); padding: 10px; object-fit: cover; box-shadow: 0 4px 24px 0 rgba(31,38,135,0.13);" alt="Profile">
       <div style="
         width: 90%;
         text-align: center;
@@ -153,7 +153,6 @@ const generatePDF = async () => {
         <p style="color: rgba(255,255,255,0.92); font-size: 24px; line-height: 1.5; margin: 0 0 12px 0; font-weight: 500;">${glassSubtitle}</p>
         ${firstSubtitles ? `<p style=\"color: rgba(255, 255, 255, 0.9); font-size: 20px; line-height: 1.5; margin: 0;\">${firstSubtitles}</p>` : ''}
       </div>
-      ${createFooterHTML(false)}
       <div style="
         position: absolute;
         bottom: 30px;
@@ -264,6 +263,12 @@ const generatePDF = async () => {
         align-items: center;
         justify-content: center;
         padding: 40px 0 0 0;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+        padding: 48px 32px 40px 32px;
       ">
         <div style="color: rgba(255,255,255,0.85); font-size: 22px; margin-bottom: 24px; font-weight: 500; letter-spacing: 1px;">Ace Your Journey</div>
         <div style="font-size: 48px; font-weight: 900; color: #fff; margin-bottom: 32px; line-height: 1.1;">
